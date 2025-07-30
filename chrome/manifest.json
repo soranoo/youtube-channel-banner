@@ -27,5 +27,11 @@
       "matches": ["https://www.youtube.com/*"],
       "js": ["content-script.js"]
     }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["settings.html"],
+      "matches": ["<all_urls>"]
+    }
   ]
 }

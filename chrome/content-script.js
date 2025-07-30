@@ -1,14 +1,28 @@
-// YouTube Channel Banner - Content Script
+/**
+ * YouTube Channel Banner - Content Script
+ * Handles YouTube page content filtering and UI injection
+ * @fileoverview Content script for hiding banned channels on YouTube
+ * @author YouTube Channel Banner
+ * @version 1.0.0
+ */
 'use strict';
 
 // === CONFIG ===
+/** @constant {boolean} IS_DEBUG - Enable debug logging */
 const IS_DEBUG = false;
+
+/** @constant {string} BAN_STORAGE_KEY - Storage key for ban list */
 const BAN_STORAGE_KEY = "yt_ban_list";
 
 // === STATE ===
+/** @type {boolean} SHOW_INLINE_BAN_BUTTONS - Whether to show inline ban buttons */
 let SHOW_INLINE_BAN_BUTTONS = false;
 
 // === Storage Helpers ===
+/**
+ * Retrieves the ban list from Chrome sync storage
+ * @returns {Promise<string[]>} Promise that resolves to the ban list array
+ */
 const getBanList = () => {
   return new Promise((resolve) => {
     chrome.storage.sync.get([BAN_STORAGE_KEY], (result) => {
@@ -18,6 +32,11 @@ const getBanList = () => {
   });
 };
 
+/**
+ * Saves the ban list to Chrome sync storage
+ * @param {string[]} list - Array of banned channel names
+ * @returns {Promise<void>} Promise that resolves when save is complete
+ */
 const saveBanList = (list) => {
   return new Promise((resolve) => {
     chrome.storage.sync.set({ [BAN_STORAGE_KEY]: list }, () => {
@@ -26,6 +45,11 @@ const saveBanList = (list) => {
   });
 };
 
+/**
+ * Adds a channel name to the ban list
+ * @param {string} name - Channel name to ban
+ * @returns {Promise<boolean>} Promise that resolves to true if added, false if already exists
+ */
 const addToBanList = (name) => {
   return new Promise((resolve) => {
     getBanList().then(list => {
@@ -41,6 +65,11 @@ const addToBanList = (name) => {
   });
 };
 
+/**
+ * Removes a channel name from the ban list
+ * @param {string} name - Channel name to unban
+ * @returns {Promise<void>} Promise that resolves when removal is complete
+ */
 const removeFromBanList = (name) => {
   return new Promise((resolve) => {
     getBanList().then(list => {
@@ -53,6 +82,12 @@ const removeFromBanList = (name) => {
 };
 
 // === UI Injection Helpers ===
+/**
+ * Creates a floating ban button for a YouTube video element
+ * @param {string} channelName - Name of the channel to ban
+ * @param {Function} onBan - Callback function when ban button is clicked
+ * @returns {HTMLButtonElement} The created ban button element
+ */
 const createFloatingBanButton = (channelName, onBan) => {
   const btn = document.createElement("button");
   btn.textContent = "🚫 Ban";
@@ -102,6 +137,11 @@ const createFloatingBanButton = (channelName, onBan) => {
   return btn;
 };
 
+/**
+ * Creates an unban button for banned content
+ * @param {string} channelName - Name of the channel to unban
+ * @returns {HTMLButtonElement} The created unban button element
+ */
 const createUnbanButton = (channelName) => {
   const btn = document.createElement("button");
   btn.textContent = "✅ Unban";
@@ -126,11 +166,22 @@ const createUnbanButton = (channelName) => {
   return btn;
 };
 
+/**
+ * Checks if a channel name is in the ban list
+ * @param {string} name - Channel name to check
+ * @param {string[]} banList - Array of banned channel names
+ * @returns {boolean} True if the channel is banned
+ */
 const isBanned = (name, banList) => {
   return banList.some(banned => name.toLowerCase().includes(banned.toLowerCase()));
 };
 
 // === Hide Content and Add Ban Message ===
+/**
+ * Hides content and adds a ban message for banned channels
+ * @param {HTMLElement} element - The DOM element to hide
+ * @param {string} channelName - Name of the banned channel
+ */
 const hideContentAndAddBanMessage = (element, channelName) => {
   // Check if already has ban message
   if (element.querySelector('.ban-message')) {
@@ -163,6 +214,10 @@ const hideContentAndAddBanMessage = (element, channelName) => {
 };
 
 // === Show Content and Remove Ban Message ===
+/**
+ * Shows previously hidden content and removes ban message
+ * @param {HTMLElement} element - The DOM element to restore
+ */
 const showContentAndRemoveBanMessage = (element) => {
   // Remove ban message
   const banMessage = element.querySelector('.ban-message');
@@ -179,6 +234,9 @@ const showContentAndRemoveBanMessage = (element) => {
 };
 
 // === Content Scan and Filter ===
+/**
+ * Scans the page for YouTube video elements and applies filtering based on ban list
+ */
 const runFiltering = () => {
   getBanList().then(banList => {
     // ytd-rich-grid-media
@@ -358,6 +416,9 @@ const runFiltering = () => {
 };
 
 // === Insert Top-Level Toggle Button ===
+/**
+ * Inserts the toggle button for showing/hiding ban buttons in the YouTube UI
+ */
 const insertToggleBanUIBtn = () => {
   const container = document.getElementById("end");
   if (!container) {
@@ -568,6 +629,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // === Auto-refresh on page changes ===
+/**
+ * Sets up automatic refresh of filtering when page content changes
+ */
 const setupAutoRefresh = () => {
   let currentUrl = location.href;
   let filteringTimeout = null;
@@ -629,6 +693,9 @@ const setupAutoRefresh = () => {
 };
 
 // === Initialize ===
+/**
+ * Initializes the content script
+ */
 const init = () => {
   console.log('[YouTube Channel Banner] Extension initialized');
   

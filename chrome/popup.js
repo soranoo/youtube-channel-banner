@@ -1,23 +1,45 @@
-// Popup script for YouTube Channel Banner
+/**
+ * Popup script for YouTube Channel Banner
+ * Handles the extension popup UI and communication with content scripts
+ * @fileoverview Popup interface for managing banned channels
+ * @author YouTube Channel Banner
+ * @version 1.0.0
+ */
 document.addEventListener('DOMContentLoaded', async () => {
+  /** @type {HTMLElement} statusElement - Status message display element */
   const statusElement = document.getElementById('status');
+  /** @type {HTMLInputElement} channelInput - Channel name input field */
   const channelInput = document.getElementById('channelInput');
+  /** @type {HTMLButtonElement} addBanButton - Add channel to ban list button */
   const addBanButton = document.getElementById('addBanButton');
+  /** @type {HTMLElement} banList - Container for displaying ban list */
   const banList = document.getElementById('banList');
+  /** @type {HTMLElement} banCount - Display for ban count */
   const banCount = document.getElementById('banCount');
+  /** @type {HTMLButtonElement} refreshButton - Refresh ban list button */
   const refreshButton = document.getElementById('refreshButton');
-  const clearAllButton = document.getElementById('clearAllButton');
+  /** @type {HTMLInputElement} searchInput - Search input field */
   const searchInput = document.getElementById('searchInput');
+  /** @type {HTMLButtonElement} clearSearchButton - Clear search button */
   const clearSearchButton = document.getElementById('clearSearchButton');
+  /** @type {HTMLButtonElement} prevPageButton - Previous page button */
   const prevPageButton = document.getElementById('prevPageButton');
+  /** @type {HTMLButtonElement} nextPageButton - Next page button */
   const nextPageButton = document.getElementById('nextPageButton');
+  /** @type {HTMLElement} pageInfo - Page information display */
   const pageInfo = document.getElementById('pageInfo');
   
+  /** @type {string[]} currentBanList - Current list of banned channels */
   let currentBanList = [];
+  /** @type {string[]} filteredBanList - Filtered list based on search */
   let filteredBanList = [];
+  /** @type {chrome.tabs.Tab|null} currentTab - Current active tab */
   let currentTab = null;
+  /** @type {number} currentPage - Current page number for pagination */
   let currentPage = 1;
+  /** @constant {number} itemsPerPage - Number of items per page */
   const itemsPerPage = 10;
+  /** @type {string} searchTerm - Current search term */
   let searchTerm = '';
   
   // Get current tab
@@ -25,15 +47,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   currentTab = tabs[0];
   
   // Check if we're on YouTube
+  /** @type {boolean} isYouTube - Whether current tab is YouTube */
   const isYouTube = currentTab && currentTab.url && currentTab.url.includes('youtube.com');
   
-  // Update status message
+  /**
+   * Updates the status message display
+   * @param {string} message - Message to display
+   * @param {'info'|'success'|'error'} type - Type of message for styling
+   */
   const updateStatus = (message, type = 'info') => {
     statusElement.textContent = message;
     statusElement.className = `status status-${type}`;
   };
   
-  // Load ban list from content script
+  /**
+   * Loads the ban list from the content script
+   * @returns {Promise<void>}
+   */
   const loadBanList = async () => {
     if (!isYouTube) {
       updateStatus('Please open a YouTube page to use this extension', 'error');
@@ -57,7 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
 
-  // Apply search filter
+  /**
+   * Applies search filter to the ban list
+   */
   const applySearchFilter = () => {
     if (!searchTerm.trim()) {
       filteredBanList = [...currentBanList];
@@ -69,14 +101,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentPage = 1; // Reset to first page when filtering
   };
 
-  // Get paginated data
+  /**
+   * Gets paginated data for current page
+   * @returns {string[]} Array of channel names for current page
+   */
   const getPaginatedData = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return filteredBanList.slice(startIndex, endIndex);
   };
 
-  // Update pagination controls
+  /**
+   * Updates pagination controls based on current state
+   */
   const updatePagination = () => {
     const totalPages = Math.ceil(filteredBanList.length / itemsPerPage);
     
@@ -94,7 +131,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
   
-  // Display ban list in UI
+  /**
+   * Displays the ban list in the UI with pagination
+   */
   const displayBanList = () => {
     banCount.textContent = currentBanList.length;
     
@@ -128,7 +167,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     updatePagination();
   };
   
-  // Add channel to ban list
+  /**
+   * Adds a channel to the ban list
+   * @param {string} channelName - Name of the channel to ban
+   * @returns {Promise<void>}
+   */
   const addToBanList = async (channelName) => {
     if (!channelName.trim()) {
       updateStatus('Please enter a channel name', 'error');
@@ -163,7 +206,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
   
-  // Remove channel from ban list
+  /**
+   * Removes a channel from the ban list
+   * @param {string} channelName - Name of the channel to unban
+   * @returns {Promise<void>}
+   */
   const removeFromBanList = async (channelName) => {
     if (!isYouTube) {
       updateStatus('Please open a YouTube page to use this extension', 'error');
@@ -188,38 +235,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
   
-  // Clear all banned channels
-  const clearAllBans = async () => {
-    if (currentBanList.length === 0) {
-      updateStatus('No channels to clear', 'info');
-      return;
-    }
-    
-    if (!isYouTube) {
-      updateStatus('Please open a YouTube page to use this extension', 'error');
-      return;
-    }
-    
-    if (!confirm(`Are you sure you want to remove all ${currentBanList.length} banned channels?`)) {
-      return;
-    }
-    
-    try {
-      const response = await chrome.runtime.sendMessage({ action: 'clearBanList' });
-      
-      if (response && response.success) {
-        updateStatus('All banned channels cleared', 'success');
-        await loadBanList(); // Refresh the list
-      } else {
-        updateStatus('Failed to clear ban list', 'error');
-      }
-    } catch (error) {
-      console.error('Error clearing ban list:', error);
-      updateStatus('Error clearing ban list', 'error');
-    }
-  };
-  
-  // Escape HTML to prevent XSS
+  /**
+   * Escapes HTML to prevent XSS attacks
+   * @param {string} text - Text to escape
+   * @returns {string} HTML-escaped text
+   */
   const escapeHtml = (text) => {
     const div = document.createElement('div');
     div.textContent = text;
@@ -238,7 +258,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   
   refreshButton.addEventListener('click', loadBanList);
-  clearAllButton.addEventListener('click', clearAllBans);
   
   // Search functionality
   searchInput.addEventListener('input', (e) => {
