@@ -13,6 +13,7 @@ Give me a ⭐ if you like it.
 - **Hide Channel Content**: Banned channels' videos will be replaced with a message indicating they are hidden
 - **Easy Management**: Add and remove channels from your ban list through the extension popup
 - **Realtime Sync Across Sessions**: Ban list is shared between regular and incognito modes
+- **Import/Export**: Backup and restore your ban list with JSON files
 
 ## 🚀 Installation
 
@@ -30,7 +31,17 @@ Give me a ⭐ if you like it.
 2. Enter a channel name in the input field
 3. Click "Ban" to add it to your ban list
 4. Use the "Remove" button next to any channel to unban it
-5. Use "Clear All" to remove all banned channels at once
+5. Click "⚙️ Settings" to access advanced features
+
+### Settings Page
+
+Access the settings page to:
+
+- **View Statistics**: See total banned channels and last update time
+- **Export Ban List**: Download your ban list as a JSON file for backup
+- **Import Ban List**: Upload a JSON file to merge with your existing list
+- **Clear All Data**: Remove all banned channels with confirmation dialog
+
 [![Screenshot](docs/imgs/ext-screenshot.png)]
 
 ### On YouTube Pages

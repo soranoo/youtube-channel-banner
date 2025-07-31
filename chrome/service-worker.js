@@ -1,12 +1,27 @@
-// Service worker for YouTube Channel Banner extension
+/**
+ * Service worker for YouTube Channel Banner extension
+ * Handles background operations and message passing between components
+ * @fileoverview Background service worker for extension coordination
+ * @author YouTube Channel Banner
+ * @version 1.0.0
+ */
+
+/** @constant {string} BAN_STORAGE_KEY - Storage key for ban list */
 const BAN_STORAGE_KEY = "yt_ban_list";
 
-// Log messages to console
+/**
+ * Logs messages to console with extension prefix
+ * @param {'info'|'warn'|'error'|'log'} level - Log level
+ * @param {...any} args - Arguments to log
+ */
 const log = (level, ...args) => {
   console[level]('[YouTube Channel Banner Service Worker]', ...args);
 };
 
-// Storage helper functions using sync storage (works in incognito)
+/**
+ * Gets the ban list from Chrome sync storage
+ * @returns {Promise<string[]>} Promise that resolves to the ban list array
+ */
 const getBanListFromStorage = () => {
   return new Promise((resolve) => {
     chrome.storage.sync.get([BAN_STORAGE_KEY], (result) => {
@@ -16,6 +31,11 @@ const getBanListFromStorage = () => {
   });
 };
 
+/**
+ * Saves the ban list to Chrome sync storage
+ * @param {string[]} banList - Array of banned channel names
+ * @returns {Promise<void>} Promise that resolves when save is complete
+ */
 const saveBanListToStorage = (banList) => {
   return new Promise((resolve) => {
     chrome.storage.sync.set({ [BAN_STORAGE_KEY]: banList }, () => {
@@ -113,6 +133,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     // Get ban list directly from sync storage
     getBanListFromStorage().then(banList => {
       sendResponse({ success: true, banList });
+    });
+    
+    return true;
+  }
+
+  if (message.action === 'setBanList') {
+    const { banList } = message;
+    
+    saveBanListToStorage(banList).then(() => {
+      // Notify all content scripts to refresh
+      chrome.tabs.query({}, (tabs) => {
+        tabs.forEach(tab => {
+          if (tab.url && tab.url.includes('youtube.com')) {
+            chrome.tabs.sendMessage(tab.id, {
+              action: 'refreshBanList'
+            });
+          }
+        });
+      });
+      sendResponse({ success: true });
     });
     
     return true;

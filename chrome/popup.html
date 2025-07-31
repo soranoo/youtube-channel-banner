@@ -16,12 +16,27 @@
     .header {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       margin-bottom: 15px;
     }
 
     .header h1 {
       font-size: 18px;
       margin: 0;
+      color: #333;
+    }
+
+    .settings-link {
+      color: #666;
+      text-decoration: none;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .settings-link:hover {
+      background-color: #f0f0f0;
       color: #333;
     }
 
@@ -177,16 +192,6 @@
       font-size: 14px;
     }
 
-    .controls .clear-all {
-      background-color: #ff5722;
-      color: white;
-      border: none;
-    }
-
-    .controls .clear-all:hover {
-      background-color: #e64a19;
-    }
-
     .controls .refresh {
       background-color: #2196f3;
       color: white;
@@ -246,6 +251,7 @@
 <body>
   <div class="header">
     <h1>🚫 YouTube Channel Banner</h1>
+    <a href="settings.html" class="settings-link">⚙️ Settings</a>
   </div>
 
   <div class="status" id="status">
@@ -268,7 +274,6 @@
     </div>
     <div class="controls">
       <button id="refreshButton" class="refresh">Refresh List</button>
-      <button id="clearAllButton" class="clear-all">Clear All</button>
     </div>
     <div class="ban-list" id="banList">
       <div class="empty-state">No channels banned yet</div>
