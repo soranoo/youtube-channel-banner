@@ -2,8 +2,8 @@
  * Settings page script for YouTube Channel Banner
  * Handles import/export functionality and settings management
  * @fileoverview Settings interface for managing extension data
- * @author YouTube Channel Banner
- * @version 1.0.0
+ * @author soranoo
+ * @version 1.0.1
  */
 document.addEventListener('DOMContentLoaded', async () => {
   /** @type {HTMLElement} statusElement - Status message display element */
