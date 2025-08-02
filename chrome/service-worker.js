@@ -2,8 +2,8 @@
  * Service worker for YouTube Channel Banner extension
  * Handles background operations and message passing between components
  * @fileoverview Background service worker for extension coordination
- * @author YouTube Channel Banner
- * @version 1.0.0
+ * @author soranoo
+ * @version 1.0.1
  */
 
 /** @constant {string} BAN_STORAGE_KEY - Storage key for ban list */
