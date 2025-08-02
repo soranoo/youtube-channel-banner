@@ -25,8 +25,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build NPM package
-        run: npm run build
+      # - name: Build NPM package
+      #   run: npm run build
 
       - name: Edit First Release Version
         run: sed -i 's/\( FIRST_RELEASE\) = "1.0.0"/\1 = "1.0.1"/' node_modules/semantic-release/lib/definitions/constants.js
@@ -38,7 +38,6 @@ jobs:
         if: github.event_name == 'push'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm run semantic-release
 
       - name: Dry Run Release
