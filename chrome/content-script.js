@@ -2,8 +2,8 @@
  * YouTube Channel Banner - Content Script
  * Handles YouTube page content filtering and UI injection
  * @fileoverview Content script for hiding banned channels on YouTube
- * @author YouTube Channel Banner
- * @version 1.0.0
+ * @author soranoo
+ * @version 1.0.1
  */
 'use strict';
 

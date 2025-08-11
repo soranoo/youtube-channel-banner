@@ -2,8 +2,8 @@
  * Popup script for YouTube Channel Banner
  * Handles the extension popup UI and communication with content scripts
  * @fileoverview Popup interface for managing banned channels
- * @author YouTube Channel Banner
- * @version 1.0.0
+ * @author soranoo
+ * @version 1.0.1
  */
 document.addEventListener('DOMContentLoaded', async () => {
   /** @type {HTMLElement} statusElement - Status message display element */
